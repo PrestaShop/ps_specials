@@ -24,10 +24,11 @@
 *}
 
 <section>
-  <h1>{l s='Specials' d='Modules.Specials.Shop'}</h1>
-  <div>
+  <h1>{l s='On sale' d='Modules.Specials.Shop'}</h1>
+  <div class="products">
     {foreach from=$products item="product"}
       {include file="catalog/_partials/miniatures/product.tpl" product=$product}
     {/foreach}
   </div>
+  <a href="{$allSpecialProductsLink}">{l s='All sale products' d='Modules.Specials.Shop'}</a>
 </section>
