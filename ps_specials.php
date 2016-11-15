@@ -42,7 +42,7 @@ class Ps_Specials extends Module implements WidgetInterface
     {
         $this->name = 'ps_specials';
         $this->author = 'PrestaShop';
-        $this->version = '1.0.0';
+        $this->version = '1.0.1';
         $this->need_instance = 0;
 
         $this->ps_versions_compliancy = array(
