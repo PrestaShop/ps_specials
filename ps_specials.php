@@ -36,6 +36,11 @@ if (!defined('_PS_VERSION_')) {
 
 class Ps_Specials extends Module implements WidgetInterface
 {
+    /**
+     * @var string Name of the module running on PS 1.6.x. Used for data migration.
+     */
+    const PS_16_EQUIVALENT_MODULE = 'blockspecials';
+
     private $templateFile;
 
     public function __construct()
@@ -61,10 +66,13 @@ class Ps_Specials extends Module implements WidgetInterface
 
     public function install()
     {
+        $this->uninstallPrestaShop16Module();
         $this->_clearCache('*');
 
-        Configuration::updateValue('BLOCKSPECIALS_SPECIALS_NBR', 8);
-
+        if (!Configuration::get('BLOCKSPECIALS_SPECIALS_NBR')) {
+            Configuration::updateValue('BLOCKSPECIALS_SPECIALS_NBR', 8);
+        }
+    
         return parent::install()
             && $this->registerHook('actionProductAdd')
             && $this->registerHook('actionProductUpdate')
@@ -80,6 +88,27 @@ class Ps_Specials extends Module implements WidgetInterface
         $this->_clearCache('*');
 
         return parent::uninstall();
+    }
+
+    /**
+     * Migrate data from 1.6 equivalent module (if applicable), then uninstall
+     */
+    public function uninstallPrestaShop16Module()
+    {
+        if (!Module::isInstalled(self::PS_16_EQUIVALENT_MODULE)) {
+            return false;
+        }
+        $oldModule = Module::getInstanceByName(self::PS_16_EQUIVALENT_MODULE);
+        if ($oldModule) {
+            // This closure calls the parent class to prevent data to be erased
+            // It allows the new module to be configured without migration
+            $parentUninstallClosure = function() {
+                return parent::uninstall();
+            };
+            $parentUninstallClosure = $parentUninstallClosure->bindTo($oldModule, get_class($oldModule));
+            $parentUninstallClosure();
+        }
+        return true;
     }
 
     public function hookActionProductAdd($params)
