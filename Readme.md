@@ -2,7 +2,7 @@
 
 ## About
 
-Displays your products that are currently on sale in a dedicated block.
+Provide information on your special offers in a specific block displayed on your homepage.
 
 ## Multistore compatibility
 

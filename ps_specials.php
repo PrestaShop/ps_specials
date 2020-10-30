@@ -54,7 +54,7 @@ class Ps_Specials extends Module implements WidgetInterface
         parent::__construct();
 
         $this->displayName = $this->trans('Specials block', array(), 'Modules.Specials.Admin');
-        $this->description = $this->trans('Displays your products that are currently on sale in a dedicated block.', array(), 'Modules.Specials.Admin');
+        $this->description = $this->trans('Provide information on your special offers in a specific block displayed on your homepage.', array(), 'Modules.Specials.Admin');
 
         $this->templateFile = 'module:ps_specials/views/templates/hook/ps_specials.tpl';
     }
