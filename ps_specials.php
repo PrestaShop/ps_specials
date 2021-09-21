@@ -252,7 +252,7 @@ class Ps_Specials extends Module implements WidgetInterface
     protected function getCacheId($name = null)
     {
         $cacheId = parent::getCacheId($name);
-        if(!empty($this->context->customer->id)){
+        if (!empty($this->context->customer->id)) {
             $cacheId .= '|' . (int) $this->context->customer->id;
         }
         return $cacheId;
