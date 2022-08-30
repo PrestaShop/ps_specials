@@ -227,7 +227,7 @@ class Ps_Specials extends Module implements WidgetInterface
         $presenterFactory = new ProductPresenterFactory($this->context);
         $presentationSettings = $presenterFactory->getPresentationSettings();
         if (version_compare(PHP_VERSION, '1.7.4', '>=')) {
-            $presenter = new PrestaShop\PrestaShop\Adapter\Presenter\Product\ProductListingPresenter(
+            $presenter = new \PrestaShop\PrestaShop\Adapter\Presenter\Product\ProductListingPresenter(
                 new ImageRetriever(
                     $this->context->link
                 ),
@@ -237,7 +237,7 @@ class Ps_Specials extends Module implements WidgetInterface
                 $this->context->getTranslator()
             );
         } else {
-            $presenter = new PrestaShop\PrestaShop\Core\Product\ProductListingPresenter(
+            $presenter = new \PrestaShop\PrestaShop\Core\Product\ProductListingPresenter(
                 new ImageRetriever(
                     $this->context->link
                 ),
