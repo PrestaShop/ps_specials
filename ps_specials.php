@@ -226,7 +226,7 @@ class Ps_Specials extends Module implements WidgetInterface
 
         $presenterFactory = new ProductPresenterFactory($this->context);
         $presentationSettings = $presenterFactory->getPresentationSettings();
-        if (version_compare(PHP_VERSION, '1.7.4', '>=')) {
+        if (version_compare(_PS_VERSION_, '1.7.4', '>=')) {
             $presenter = new \PrestaShop\PrestaShop\Adapter\Presenter\Product\ProductListingPresenter(
                 new ImageRetriever(
                     $this->context->link
