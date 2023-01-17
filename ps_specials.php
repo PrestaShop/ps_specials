@@ -137,6 +137,7 @@ class Ps_Specials extends Module implements WidgetInterface
                 $output .= $this->displayConfirmation($this->trans('The settings have been updated.', array(), 'Admin.Notifications.Success'));
             }
         }
+
         return $output.$this->renderForm();
     }
 
