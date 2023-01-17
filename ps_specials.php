@@ -130,15 +130,15 @@ class Ps_Specials extends Module implements WidgetInterface
             if (!empty($errors)) {
                 $output = $this->displayError($errors);
             } else {
-                Configuration::updateValue('BLOCKSPECIALS_SPECIALS_NBR', (int)Tools::getValue('BLOCKSPECIALS_SPECIALS_NBR'));
+                Configuration::updateValue('BLOCKSPECIALS_SPECIALS_NBR', (int) Tools::getValue('BLOCKSPECIALS_SPECIALS_NBR'));
 
                 $this->_clearCache('*');
 
-                $output .= $this->displayConfirmation($this->trans('The settings have been updated.', array(), 'Admin.Notifications.Success'));
+                $output .= $this->displayConfirmation($this->trans('The settings have been updated.', [], 'Admin.Notifications.Success'));
             }
         }
 
-        return $output.$this->renderForm();
+        return $output . $this->renderForm();
     }
 
     public function renderForm()
