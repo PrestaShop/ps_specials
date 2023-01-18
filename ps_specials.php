@@ -122,11 +122,19 @@ class Ps_Specials extends Module implements WidgetInterface
         $output = '';
 
         if (Tools::isSubmit('submitSpecials')) {
-            Configuration::updateValue('BLOCKSPECIALS_SPECIALS_NBR', (int) Tools::getValue('BLOCKSPECIALS_SPECIALS_NBR'));
+            $nbr = Tools::getValue('BLOCKSPECIALS_SPECIALS_NBR');
+            if (!Validate::isInt($nbr) || $nbr <= 0) {
+                $errors = $this->trans('The number of products is invalid. Please enter a positive number.', [], 'Modules.Specials.Admin');
+            }
+            if (!empty($errors)) {
+                $output = $this->displayError($errors);
+            } else {
+                Configuration::updateValue('BLOCKSPECIALS_SPECIALS_NBR', (int) Tools::getValue('BLOCKSPECIALS_SPECIALS_NBR'));
 
-            $this->_clearCache('*');
+                $this->_clearCache('*');
 
-            $output .= $this->displayConfirmation($this->trans('The settings have been updated.', [], 'Admin.Notifications.Success'));
+                $output .= $this->displayConfirmation($this->trans('The settings have been updated.', [], 'Admin.Notifications.Success'));
+            }
         }
 
         return $output . $this->renderForm();
