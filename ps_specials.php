@@ -256,13 +256,19 @@ class Ps_Specials extends Module implements WidgetInterface
             );
         }
 
+        // Now, we can present the products for the template.
         $products_for_template = [];
 
         if (is_array($products)) {
+            // Assemble & present in bulk or separately, depending on core version
+            $assembleInBulk = method_exists($assembler, 'assembleProducts');
+            if ($assembleInBulk) {
+                $products = $assembler->assembleProducts($products);
+            }
             foreach ($products as $rawProduct) {
                 $products_for_template[] = $presenter->present(
                     $presentationSettings,
-                    $assembler->assembleProduct($rawProduct),
+                    ($assembleInBulk ? $rawProduct : $assembler->assembleProduct($rawProduct)),
                     $this->context->language
                 );
             }
