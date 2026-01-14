@@ -69,9 +69,9 @@ class Ps_Specials extends Module implements WidgetInterface
             && $this->registerHook('actionProductAdd')
             && $this->registerHook('actionProductUpdate')
             && $this->registerHook('actionProductDelete')
-            && $this->registerHook('actionObjectSpecificPriceCoreDeleteAfter')
-            && $this->registerHook('actionObjectSpecificPriceCoreAddAfter')
-            && $this->registerHook('actionObjectSpecificPriceCoreUpdateAfter')
+            && $this->registerHook('actionObjectSpecificPriceDeleteAfter')
+            && $this->registerHook('actionObjectSpecificPriceAddAfter')
+            && $this->registerHook('actionObjectSpecificPriceUpdateAfter')
             && $this->registerHook('displayHome');
     }
 
@@ -97,17 +97,17 @@ class Ps_Specials extends Module implements WidgetInterface
         $this->_clearCache('*');
     }
 
-    public function hookActionObjectSpecificPriceCoreDeleteAfter($params)
+    public function hookActionObjectSpecificPriceDeleteAfter($params)
     {
         $this->_clearCache('*');
     }
 
-    public function hookActionObjectSpecificPriceCoreAddAfter($params)
+    public function hookActionObjectSpecificPriceAddAfter($params)
     {
         $this->_clearCache('*');
     }
 
-    public function hookActionObjectSpecificPriceCoreUpdateAfter($params)
+    public function hookActionObjectSpecificPriceUpdateAfter($params)
     {
         $this->_clearCache('*');
     }
