@@ -227,7 +227,9 @@ class Ps_Specials extends Module implements WidgetInterface
         $products = Product::getPricesDrop(
             (int) Context::getContext()->language->id,
             0,
-            (int) Configuration::get('BLOCKSPECIALS_SPECIALS_NBR')
+            (int) Configuration::get('BLOCKSPECIALS_SPECIALS_NBR'),
+            'id_product',
+            'DESC'
         );
 
         $assembler = new ProductAssembler($this->context);
