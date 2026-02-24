@@ -228,6 +228,7 @@ class Ps_Specials extends Module implements WidgetInterface
             (int) Context::getContext()->language->id,
             0,
             (int) Configuration::get('BLOCKSPECIALS_SPECIALS_NBR'),
+            false,
             'id_product',
             'DESC'
         );
