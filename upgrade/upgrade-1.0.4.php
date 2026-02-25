@@ -29,7 +29,7 @@
  *
  * @return bool
  */
-function upgrade_module_1_0_4($object)
+function upgrade_module_1_0_4($module)
 {
     $hooksToUnregister = [
         'actionObjectSpecificPriceCoreAddAfter',
@@ -39,7 +39,7 @@ function upgrade_module_1_0_4($object)
 
     foreach ($hooksToUnregister as $hookName) {
         // Unregister module from hook
-        $object->unregisterHook($hookName);
+        $module->unregisterHook($hookName);
         $hookId = Hook::getIdByName($hookName);
 
         // Remove unused hook created by mistake
@@ -48,7 +48,7 @@ function upgrade_module_1_0_4($object)
         }
     }
 
-    $object->registerHook([
+    $module->registerHook([
         'actionObjectSpecificPriceAddAfter',
         'actionObjectSpecificPriceUpdateAfter',
         'actionObjectSpecificPriceDeleteAfter',
