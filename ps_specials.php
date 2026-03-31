@@ -42,7 +42,7 @@ class Ps_Specials extends Module implements WidgetInterface
         $this->name = 'ps_specials';
         $this->tab = 'front_office_features';
         $this->author = 'PrestaShop';
-        $this->version = '1.0.3';
+        $this->version = '2.0.0';
         $this->need_instance = 0;
 
         $this->ps_versions_compliancy = [
@@ -61,60 +61,14 @@ class Ps_Specials extends Module implements WidgetInterface
 
     public function install()
     {
-        $this->_clearCache('*');
-
         Configuration::updateValue('BLOCKSPECIALS_SPECIALS_NBR', 8);
 
-        return parent::install()
-            && $this->registerHook('actionProductAdd')
-            && $this->registerHook('actionProductUpdate')
-            && $this->registerHook('actionProductDelete')
-            && $this->registerHook('actionObjectSpecificPriceDeleteAfter')
-            && $this->registerHook('actionObjectSpecificPriceAddAfter')
-            && $this->registerHook('actionObjectSpecificPriceUpdateAfter')
-            && $this->registerHook('displayHome');
+        return parent::install() && $this->registerHook('displayHome');
     }
 
     public function uninstall()
     {
-        $this->_clearCache('*');
-
         return parent::uninstall();
-    }
-
-    public function hookActionProductAdd($params)
-    {
-        $this->_clearCache('*');
-    }
-
-    public function hookActionProductUpdate($params)
-    {
-        $this->_clearCache('*');
-    }
-
-    public function hookActionProductDelete($params)
-    {
-        $this->_clearCache('*');
-    }
-
-    public function hookActionObjectSpecificPriceDeleteAfter($params)
-    {
-        $this->_clearCache('*');
-    }
-
-    public function hookActionObjectSpecificPriceAddAfter($params)
-    {
-        $this->_clearCache('*');
-    }
-
-    public function hookActionObjectSpecificPriceUpdateAfter($params)
-    {
-        $this->_clearCache('*');
-    }
-
-    public function _clearCache($template, $cache_id = null, $compile_id = null)
-    {
-        return parent::_clearCache($this->templateFile);
     }
 
     public function getContent()
@@ -130,8 +84,6 @@ class Ps_Specials extends Module implements WidgetInterface
                 $output = $this->displayError($errors);
             } else {
                 Configuration::updateValue('BLOCKSPECIALS_SPECIALS_NBR', (int) Tools::getValue('BLOCKSPECIALS_SPECIALS_NBR'));
-
-                $this->_clearCache('*');
 
                 $output .= $this->displayConfirmation($this->trans('The settings have been updated.', [], 'Admin.Notifications.Success'));
             }
@@ -178,7 +130,9 @@ class Ps_Specials extends Module implements WidgetInterface
             '&module_name=' . $this->name;
         $helper->token = Tools::getAdminTokenLite('AdminModules');
         $helper->tpl_vars = [
-            'fields_value' => $this->getConfigFieldsValues(),
+            'fields_value' => [
+                'BLOCKSPECIALS_SPECIALS_NBR' => Tools::getValue('BLOCKSPECIALS_SPECIALS_NBR', Configuration::get('BLOCKSPECIALS_SPECIALS_NBR')),
+            ],
             'languages' => $this->context->controller->getLanguages(),
             'id_language' => $this->context->language->id,
         ];
@@ -186,26 +140,17 @@ class Ps_Specials extends Module implements WidgetInterface
         return $helper->generateForm([$fields_form]);
     }
 
-    public function getConfigFieldsValues()
-    {
-        return [
-            'BLOCKSPECIALS_SPECIALS_NBR' => Tools::getValue('BLOCKSPECIALS_SPECIALS_NBR', Configuration::get('BLOCKSPECIALS_SPECIALS_NBR')),
-        ];
-    }
-
     public function renderWidget($hookName = null, array $configuration = [])
     {
-        if (!$this->isCached($this->templateFile, $this->getCacheId('ps_specials'))) {
-            $variables = $this->getWidgetVariables($hookName, $configuration);
+        $variables = $this->getWidgetVariables($hookName, $configuration);
 
-            if (empty($variables)) {
-                return false;
-            }
-
-            $this->smarty->assign($variables);
+        if (empty($variables)) {
+            return false;
         }
 
-        return $this->fetch($this->templateFile, $this->getCacheId('ps_specials'));
+        $this->smarty->assign($variables);
+
+        return $this->fetch($this->templateFile);
     }
 
     public function getWidgetVariables($hookName = null, array $configuration = [])
@@ -263,15 +208,5 @@ class Ps_Specials extends Module implements WidgetInterface
         }
 
         return $products_for_template;
-    }
-
-    protected function getCacheId($name = null)
-    {
-        $cacheId = parent::getCacheId($name);
-        if (!empty($this->context->customer->id)) {
-            $cacheId .= '|' . (int) $this->context->customer->id;
-        }
-
-        return $cacheId;
     }
 }
