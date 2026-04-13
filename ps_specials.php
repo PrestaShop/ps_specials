@@ -229,7 +229,7 @@ class Ps_Specials extends Module implements WidgetInterface
             0,
             (int) Configuration::get('BLOCKSPECIALS_SPECIALS_NBR'),
             false,
-            'id_product',
+            'date_add',
             'DESC'
         );
 
