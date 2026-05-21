@@ -42,11 +42,11 @@ class Ps_Specials extends Module implements WidgetInterface
         $this->name = 'ps_specials';
         $this->tab = 'front_office_features';
         $this->author = 'PrestaShop';
-        $this->version = '1.0.3';
+        $this->version = '2.0.0';
         $this->need_instance = 0;
 
         $this->ps_versions_compliancy = [
-            'min' => '1.7.0.0',
+            'min' => '8.1.0',
             'max' => _PS_VERSION_,
         ];
 
@@ -61,60 +61,14 @@ class Ps_Specials extends Module implements WidgetInterface
 
     public function install()
     {
-        $this->_clearCache('*');
-
         Configuration::updateValue('BLOCKSPECIALS_SPECIALS_NBR', 8);
 
-        return parent::install()
-            && $this->registerHook('actionProductAdd')
-            && $this->registerHook('actionProductUpdate')
-            && $this->registerHook('actionProductDelete')
-            && $this->registerHook('actionObjectSpecificPriceCoreDeleteAfter')
-            && $this->registerHook('actionObjectSpecificPriceCoreAddAfter')
-            && $this->registerHook('actionObjectSpecificPriceCoreUpdateAfter')
-            && $this->registerHook('displayHome');
+        return parent::install() && $this->registerHook('displayHome');
     }
 
     public function uninstall()
     {
-        $this->_clearCache('*');
-
         return parent::uninstall();
-    }
-
-    public function hookActionProductAdd($params)
-    {
-        $this->_clearCache('*');
-    }
-
-    public function hookActionProductUpdate($params)
-    {
-        $this->_clearCache('*');
-    }
-
-    public function hookActionProductDelete($params)
-    {
-        $this->_clearCache('*');
-    }
-
-    public function hookActionObjectSpecificPriceCoreDeleteAfter($params)
-    {
-        $this->_clearCache('*');
-    }
-
-    public function hookActionObjectSpecificPriceCoreAddAfter($params)
-    {
-        $this->_clearCache('*');
-    }
-
-    public function hookActionObjectSpecificPriceCoreUpdateAfter($params)
-    {
-        $this->_clearCache('*');
-    }
-
-    public function _clearCache($template, $cache_id = null, $compile_id = null)
-    {
-        parent::_clearCache($this->templateFile);
     }
 
     public function getContent()
@@ -130,8 +84,6 @@ class Ps_Specials extends Module implements WidgetInterface
                 $output = $this->displayError($errors);
             } else {
                 Configuration::updateValue('BLOCKSPECIALS_SPECIALS_NBR', (int) Tools::getValue('BLOCKSPECIALS_SPECIALS_NBR'));
-
-                $this->_clearCache('*');
 
                 $output .= $this->displayConfirmation($this->trans('The settings have been updated.', [], 'Admin.Notifications.Success'));
             }
@@ -178,7 +130,9 @@ class Ps_Specials extends Module implements WidgetInterface
             '&module_name=' . $this->name;
         $helper->token = Tools::getAdminTokenLite('AdminModules');
         $helper->tpl_vars = [
-            'fields_value' => $this->getConfigFieldsValues(),
+            'fields_value' => [
+                'BLOCKSPECIALS_SPECIALS_NBR' => Tools::getValue('BLOCKSPECIALS_SPECIALS_NBR', Configuration::get('BLOCKSPECIALS_SPECIALS_NBR')),
+            ],
             'languages' => $this->context->controller->getLanguages(),
             'id_language' => $this->context->language->id,
         ];
@@ -186,26 +140,17 @@ class Ps_Specials extends Module implements WidgetInterface
         return $helper->generateForm([$fields_form]);
     }
 
-    public function getConfigFieldsValues()
-    {
-        return [
-            'BLOCKSPECIALS_SPECIALS_NBR' => Tools::getValue('BLOCKSPECIALS_SPECIALS_NBR', Configuration::get('BLOCKSPECIALS_SPECIALS_NBR')),
-        ];
-    }
-
     public function renderWidget($hookName = null, array $configuration = [])
     {
-        if (!$this->isCached($this->templateFile, $this->getCacheId('ps_specials'))) {
-            $variables = $this->getWidgetVariables($hookName, $configuration);
+        $variables = $this->getWidgetVariables($hookName, $configuration);
 
-            if (empty($variables)) {
-                return false;
-            }
-
-            $this->smarty->assign($variables);
+        if (empty($variables)) {
+            return false;
         }
 
-        return $this->fetch($this->templateFile, $this->getCacheId('ps_specials'));
+        $this->smarty->assign($variables);
+
+        return $this->fetch($this->templateFile);
     }
 
     public function getWidgetVariables($hookName = null, array $configuration = [])
@@ -227,34 +172,25 @@ class Ps_Specials extends Module implements WidgetInterface
         $products = Product::getPricesDrop(
             (int) Context::getContext()->language->id,
             0,
-            (int) Configuration::get('BLOCKSPECIALS_SPECIALS_NBR')
+            (int) Configuration::get('BLOCKSPECIALS_SPECIALS_NBR'),
+            false,
+            'date_add',
+            'DESC'
         );
 
         $assembler = new ProductAssembler($this->context);
 
         $presenterFactory = new ProductPresenterFactory($this->context);
         $presentationSettings = $presenterFactory->getPresentationSettings();
-        if (version_compare(_PS_VERSION_, '1.7.5', '>=')) {
-            $presenter = new \PrestaShop\PrestaShop\Adapter\Presenter\Product\ProductListingPresenter(
-                new ImageRetriever(
-                    $this->context->link
-                ),
-                $this->context->link,
-                new PriceFormatter(),
-                new ProductColorsRetriever(),
-                $this->context->getTranslator()
-            );
-        } else {
-            $presenter = new \PrestaShop\PrestaShop\Core\Product\ProductListingPresenter(
-                new ImageRetriever(
-                    $this->context->link
-                ),
-                $this->context->link,
-                new PriceFormatter(),
-                new ProductColorsRetriever(),
-                $this->context->getTranslator()
-            );
-        }
+        $presenter = new PrestaShop\PrestaShop\Adapter\Presenter\Product\ProductListingPresenter(
+            new ImageRetriever(
+                $this->context->link
+            ),
+            $this->context->link,
+            new PriceFormatter(),
+            new ProductColorsRetriever(),
+            $this->context->getTranslator()
+        );
 
         // Now, we can present the products for the template.
         $products_for_template = [];
@@ -268,22 +204,12 @@ class Ps_Specials extends Module implements WidgetInterface
             foreach ($products as $rawProduct) {
                 $products_for_template[] = $presenter->present(
                     $presentationSettings,
-                    ($assembleInBulk ? $rawProduct : $assembler->assembleProduct($rawProduct)),
+                    $assembleInBulk ? $rawProduct : $assembler->assembleProduct($rawProduct),
                     $this->context->language
                 );
             }
         }
 
         return $products_for_template;
-    }
-
-    protected function getCacheId($name = null)
-    {
-        $cacheId = parent::getCacheId($name);
-        if (!empty($this->context->customer->id)) {
-            $cacheId .= '|' . (int) $this->context->customer->id;
-        }
-
-        return $cacheId;
     }
 }

@@ -6,7 +6,7 @@ Provide information on your special offers in a specific block displayed on your
 
 ## Compatibility
 
-PrestaShop: `1.7.0.0` or later
+PrestaShop: `8.1.0` or later
 
 ## Multistore compatibility
 
